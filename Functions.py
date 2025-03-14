@@ -145,18 +145,6 @@ def setupC3DielModel(core_model,transferMets="",starch_sucrose_ratio=None):
     cobra_model.reactions.get_by_id("NH4_tx2").lower_bound=0
     cobra_model.reactions.get_by_id("NH4_tx2").upper_bound=0
 
-    #Set pG6P transporter to 0
-    cobra_model.reactions.get_by_id("G6P_Pi_pc1").lower_bound=0
-    cobra_model.reactions.get_by_id("G6P_Pi_pc1").upper_bound=0
-    cobra_model.reactions.get_by_id("G6P_Pi_pc2").lower_bound=0
-    cobra_model.reactions.get_by_id("G6P_Pi_pc2").upper_bound=0
-
-    #Set starch phosphorylase to 0
-    cobra_model.reactions.get_by_id("RXN_1826_p1").lower_bound=0
-    cobra_model.reactions.get_by_id("RXN_1826_p1").upper_bound=0
-    cobra_model.reactions.get_by_id("RXN_1826_p2").lower_bound=0
-    cobra_model.reactions.get_by_id("RXN_1826_p2").upper_bound=0
-
     #Turn off PTOX
     cobra_model.reactions.get_by_id("Plastoquinol_Oxidase_p1").lower_bound=0
     cobra_model.reactions.get_by_id("Plastoquinol_Oxidase_p1").upper_bound=0

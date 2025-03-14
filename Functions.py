@@ -299,9 +299,6 @@ def setupC4DielModel(core_model,transferMets="",M_BS_transferMets="",starch_sucr
     C4_model.reactions.get_by_id("Total_Phloem_output_tx").add_metabolites({"X_Phloem_contribution_t3" : -0.75, "X_Phloem_contribution_t4" : -0.25})
     reac.objective_coefficient = 1
 
-    # Mesophyll rubisco set to 0
-    C4_model.reactions.RIBULOSE_BISPHOSPHATE_CARBOXYLASE_RXN_p1.bounds=(0,0)
-
     # Bundle sheath CO2 uptake constraint to 0
     C4_model.reactions.CO2_tx3.bounds=(0,0)
     C4_model.reactions.CO2_tx4.bounds=(0,0)

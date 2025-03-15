@@ -8,5 +8,16 @@ A repository housing scripts that can be used to generate C3, CAM and C4 diel le
 [Model C4 leaf metabolism](https://colab.research.google.com/drive/17ztwZvQ7urK_zM2SZ7pHNRdCxeMfocjv?usp=sharing)  
 [Case study and flux visualization](https://colab.research.google.com/drive/1vXCq1sA72_pQM_V1tugicJUqPi-nGn2j?usp=sharing)  
 
+### Repository contents
+- Functions.py - a file containing all user-defined functions required in the study
+- PlantCoreMetabolism_v2_0_0.xml - The PlantCoreMetabolism version 2.0.0 model in SBML format
+- C3_model.sbml - diel leaf model constrained for C3 photosynthesis
+- C4_model.sbml - diel leaf meodel constrained for C4 photosynthesis
+- PlantCoreMetabolism2.cys - manually organized Cytoscape network of the core model with styles configured to visualize fluxes from 2-phase diel FBA model
+- Generating_all_models.ipynb - an IPython notebook used to generate C3 and CAM models
+- dielC3_script.ipynb - an IPython notebook that uses the C3 sbml file to model C3 metabolism
+- dielCAM_script.ipynb - an IPython notebook that uses the C3 sbml file to model CAM metabolism
+- dielC4_script.ipynb - an IPython notebook that uses the C4 sbml file to model C4 metabolism
+
 
 

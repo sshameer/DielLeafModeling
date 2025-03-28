@@ -435,3 +435,245 @@ def generateFluxMap(cobra_model,solution, outfile,phases = 2):
                 f.write("R_%s (reaction-product) M_%s\t%s\t%s\t0\tnone\n" % (RXN,PROD,value,status1));
 
     f.close();
+
+
+def convertToClassicalModel(cobra_model2,comp="*",updateCharges=""):
+    if not updateCharges == "":
+        #override charges from file
+        fin = open(updateCharges,"r")
+        ChargeDict=dict()
+        for line in fin:
+            met=line.replace("\n","").split("\t")[0]
+            met = met.replace("-","_")
+            charge = line.replace("\n","").split("\t")[1]
+            ChargeDict[met]=charge
+        fin.close()
+
+        temp=cobra_model2.copy()
+        for met in temp.metabolites:
+            if(met.compartment=="b"):
+                cobra_model2.metabolites.get_by_id(met.id).remove_from_model()
+
+        for met in cobra_model2.metabolites:
+            tempMet=met.id
+            if(["1","2","3","4","5","6","7","8","9"].__contains__(met.id[len(met.id)-1])):
+                tempMet = met.id[0:len(met.id)-1]
+            elif(met.id[len(met.id)-2:]=="10"):
+                tempMet = met.id[0:len(met.id)-2]
+            if(ChargeDict.keys().__contains__(tempMet)):
+                met.charge = ChargeDict.get(tempMet)
+            if met.charge is None:
+                met.charge=0
+
+    import re
+    #List metabolites that were added
+    fractionMets=set()
+    for rxn in cobra_model2.reactions:
+        for met in rxn.metabolites.keys():
+            a=re.search("^a{1,3}",met.id)
+            anion=""
+            if a:
+                anion=a.group(0)
+            b=re.search("^b{1,3}",met.id)
+            basic=""
+            if b:
+                basic=b.group(0)
+            if (abs(rxn.metabolites.get(met)) % 1 > 0 and (not anion == "" or not basic== "")):
+                if not comp == "*":
+                    if met.compartment == comp:
+                        fractionMets.add(met.id)
+                else:
+                    fractionMets.add(met.id)
+    cobra_model = cobra_model2.copy()
+
+    for met in fractionMets:
+        for rxn in cobra_model.metabolites.get_by_id(met).reactions:
+            a=re.search("^a{1,3}",met)
+            anion=""
+            if a:
+                anion=a.group(0)
+            b=re.search("^b{1,3}",met)
+            basic=""
+            if b:
+                basic=b.group(0)
+            prefix = anion
+            if prefix == "":
+                prefix = basic
+                
+            coeff1 = rxn.metabolites.get(cobra_model.metabolites.get_by_id(met[len(prefix):]))
+            if coeff1 is None:
+                  raise ValueError(f"Metabolite {met[len(prefix):]} not found in reaction {rxn.id}")
+            rxn.add_metabolites({cobra_model.metabolites.get_by_id(met[len(prefix):]):-1*coeff1})
+            coeff2 = rxn.metabolites.get(cobra_model.metabolites.get_by_id(met))
+            rxn.add_metabolites({cobra_model.metabolites.get_by_id(met):-1*coeff2})
+            Charge=(coeff1*float(cobra_model.metabolites.get_by_id(met[len(prefix):]).charge))+(coeff2*float(cobra_model.metabolites.get_by_id(met).charge))-((coeff1+coeff2)*float(cobra_model.metabolites.get_by_id(met[len(prefix):]).charge))
+            if rxn.id.__contains__("_Transfer"):
+                compSet = set()
+                for m in rxn.metabolites:
+                    compSet.add(m.compartment)
+                this = cobra_model.metabolites.get_by_id(met).compartment
+                rxn.add_metabolites({cobra_model.metabolites.get_by_id(met[len(prefix):]):coeff1+coeff2,cobra_model.metabolites.get_by_id("PROTON_"+cobra_model.metabolites.get_by_id(met).compartment):round(Charge,4)})
+                other = compSet.difference(this)
+                for c in other:
+                    if cobra_model.metabolites.get_by_id("PROTON_"+c).reactions.__contains__(rxn):
+                        prot_bal = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+c)) + rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+this))
+                        if prot_bal > 0:
+                            tempCoeff = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+c))
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+c):-1*tempCoeff})
+
+                            tempCoeff = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+this))
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+this):-1*tempCoeff})
+
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+c):prot_bal})
+                        elif prot_bal < 0:
+                            tempCoeff = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+c))
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+c):-1*tempCoeff})
+
+                            tempCoeff = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+this))
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+this):-1*tempCoeff})
+
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+c):prot_bal})
+                        else:
+                            tempCoeff = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+c))
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+c):-1*tempCoeff})
+
+                            tempCoeff = rxn.metabolites.get(cobra_model.metabolites.get_by_id("PROTON_"+this))
+                            rxn.add_metabolites({cobra_model.metabolites.get_by_id("PROTON_"+this):-1*tempCoeff})
+            else:
+                rxn.add_metabolites({cobra_model.metabolites.get_by_id(met[len(prefix):]):coeff1+coeff2,cobra_model.metabolites.get_by_id("PROTON_"+cobra_model.metabolites.get_by_id(met).compartment):round(Charge,4)})
+    uncharged = cobra_model.copy()
+    return uncharged
+
+
+#This function apply the new pH to the compartment
+def convertToFractionalCharges(uncharged,infile="MetaboliteChargedStates.xlsx",compH={"v2":5.5},TransferTag=""):
+    model = uncharged.copy()
+
+    from xlrd import open_workbook
+    from cobra.core import Metabolite
+
+    wb = open_workbook(infile)
+
+    FractionDict = dict()
+    FractionCharge = dict()
+    for comp in compH.keys():
+        pH = compH.get(comp)
+        tempDict1 = dict()
+        for sheet in wb.sheets():
+            met = str(sheet.name)
+            metID = met+"_"+comp
+            tempDict2 = dict()
+            for i in range(1,sheet.ncols):
+                charge = sheet.cell(0,i).value
+                if charge == "" or charge == " ":
+                   continue
+                row = int((pH*10)-9)
+                pH = sheet.cell(row,0).value
+                n = int(model.metabolites.get_by_id(metID).charge) - charge
+                prefix = ""
+                if n < 0:
+                    prefix = "a"*int(abs(n))
+                elif n > 0:
+                    prefix = "b"*int(abs(n))
+                met_spcl = prefix+met
+                FractionCharge[met_spcl]=int(charge)
+                fra = sheet.cell(row,i).value
+                if fra > 0:
+                    if tempDict2.keys().__contains__(met_spcl):
+                        tempDict2[met_spcl] = tempDict2[met_spcl]+fra
+                    else:
+                        tempDict2[met_spcl] = fra
+            tempDict1[met]=tempDict2
+        FractionDict[pH] = tempDict1
+
+    rxnUpdated = set()
+
+    for comp in compH.keys():
+        pH = compH.get(comp)
+        for met in FractionDict[pH].keys():
+            for rxn in model.metabolites.get_by_id(met+"_"+comp).reactions:
+                if rxn.id.__contains__("Transfer"):
+                    rxnUpdated.add(rxn)
+                coeff = rxn.metabolites.get(model.metabolites.get_by_id(met+"_"+comp))
+                rxn.add_metabolites({model.metabolites.get_by_id(met+"_"+comp):-1*coeff})
+                for met_spcl in FractionDict[pH][met].keys():
+                    coeff_new = coeff*FractionDict[pH][met][met_spcl]*0.01
+                    f = 0
+                    for m in model.metabolites.query(met_spcl+"_"+comp):
+                        if m.id==met_spcl+"_"+comp:
+                            f=1
+                            break
+                    if f == 0:
+                        m=Metabolite(met_spcl+"_"+comp)
+                        m.name = met_spcl+"_"+comp
+                        m.formula = model.metabolites.get_by_id(met+"_"+comp).formula
+                        if "a" in met_spcl:
+                            if m.formula.__contains__("H"):
+                                parts = m.formula.split("H")
+                                m.formula = parts[0]+"H"+str(int(parts[1][0])+(met_spcl.count("a")))+parts[1][1:]
+                            else:
+                                m.formula = m.formula+"H"+(len(met_spcl)*1)
+                        else:
+                            if m.formula.__contains__("H"):
+                                parts = m.formula.split("H")
+                                m.formula = parts[0]+"H"+str(int(parts[1][0])-(met_spcl.count("a")))+parts[1][1:]
+                        m.notes = model.metabolites.get_by_id(met+"_"+comp).notes
+                        m.charge = FractionCharge[met_spcl]
+                        m.compartment = comp
+                    rxn.add_metabolites({m:round(coeff_new,3)})
+                Charge = 0
+                for tmet in rxn.metabolites.keys():
+                    if tmet.charge is not None:
+                        Charge = Charge + (int(tmet.charge) * rxn.metabolites.get(tmet))
+                    else:
+                        print(f"Warning: Metabolite {tmet} has no charge information.")
+                if Charge != 0:
+                    rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+model.metabolites.get_by_id(met+"_"+comp).compartment):-1*Charge})
+    for rxn in rxnUpdated:
+        compSet = set()
+        n = 0
+        for met in rxn.metabolites.keys():
+            if met.id.__contains__("PROTON"):
+                n=n+1
+            compSet.add(met.compartment)
+        c=list(compSet)
+        a=c[0][len(c[0])-1]
+        b=c[1][len(c[1])-1]
+        if a > b:
+            thisC = c[1]
+            nextC = c[0]
+        else:
+            thisC = c[0]
+            nextC = c[1]
+        if rxn.id.__contains__("MAL_v_Transfer"):
+           print("This ="+thisC)
+           print("Next ="+nextC)
+           print(rxn.reaction)
+           print(f"thisC: {thisC}, nextC: {nextC}")
+        if nextC in ["v1", "v2"]:
+            proton_id = "PROTON_" + nextC
+        else:
+            raise ValueError(f"Unexpected compartment: {nextC}")
+        if rxn.metabolites.keys().__contains__(model.metabolites.get_by_id("PROTON_"+thisC)):
+            this_prot = rxn.metabolites.get(model.metabolites.get_by_id("PROTON_"+thisC))
+            tempCoeff = rxn.metabolites.get(model.metabolites.get_by_id("PROTON_"+thisC))
+            rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+thisC):-1*tempCoeff})
+        else:
+            this_prot = 0
+        if rxn.metabolites.keys().__contains__(model.metabolites.get_by_id("PROTON_"+nextC)):
+            next_prot = rxn.metabolites.get(model.metabolites.get_by_id("PROTON_"+nextC))
+            tempCoeff = rxn.metabolites.get(model.metabolites.get_by_id("PROTON_"+nextC))
+            rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+nextC):-1*tempCoeff})
+        else:
+            next_prot = 0
+        net = this_prot+next_prot
+        if net > 0 and "_v_dielTransfer" not in rxn.id:
+            rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+nextC):net})
+        elif net < 0 and "_v_dielTransfer" not in rxn.id:
+            rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+thisC):net})
+        elif net > 0 and "_v_dielTransfer" in rxn.id:
+            rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+thisC):net})
+        elif net < 0 and "_v_dielTransfer" in rxn.id:
+            rxn.add_metabolites({model.metabolites.get_by_id("PROTON_"+nextC):net})
+    return model
+    

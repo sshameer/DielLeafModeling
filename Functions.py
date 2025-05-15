@@ -1,3 +1,19 @@
+#################################################################################
+#The file contains functions used in the study to describe different case uses. 
+#Diel leaf model construction required a function to make the PlantCoreMetabolism-
+#model to a day-night C3plant condition. This function can be used in any other -
+#leaf metabolic model to make it diel. We created another function for creating a-
+#diel C4 model, as mentioned in the use cases part of the manuscript. A general -
+#function was created to visualise model results and represented as generateFluxMap.
+#We have updated the pH of the model compartments and included fractionally charged- 
+#forms of metabolites using two different functions, convertToClassicalModel and  -
+#convertToFractionalCharges, at the bottom of this documentation file.
+##################################################################################
+
+#1. This function contains the basic constraints for making a diel C3 leaf model
+    #It duplicates the model for the day-night phase and adds the tags as 1 and 2 on 
+    #compartments, metabolites and reactions. After that, merge them. Then customizable
+    #constraints were included for its simplicity and flexibility. 
 ########################################################
 #This function was used to set up a C3 leaf diel model #
 ########################################################
@@ -199,6 +215,12 @@ def setupC3DielModel(core_model,transferMets="",starch_sucrose_ratio=None):
     return cobra_model
 
 
+    #####################################################################################
+#2. This function contains the basic constraints for making a diel C4 leaf model
+    #It duplicates the model for the day-night phase and adds the tags as 1 and 2 on 
+    #compartments, metabolites and reactions. After that, merge them. Then customizable
+    #constraints were included for its simplicity and flexibility.
+
 ########################################################
 #This function was used to set up a C4 leaf diel model #
 ########################################################
@@ -310,7 +332,10 @@ def setupC4DielModel(core_model,transferMets="",M_BS_transferMets="",starch_sucr
     C4_model.reactions.get_by_id("RIBULOSE_BISPHOSPHATE_CARBOXYLASE_RXN_p3").add_metabolites({Rubisco_balance:-1})
 
     return C4_model
-
+    
+#################################################################################
+#3. This function helps to visualize the model results by generating Fluxmaps
+#################################################################################
 
 def generateFluxMap(cobra_model,solution, outfile,phases = 2):
     import cobra
@@ -435,7 +460,10 @@ def generateFluxMap(cobra_model,solution, outfile,phases = 2):
                 f.write("R_%s (reaction-product) M_%s\t%s\t%s\t0\tnone\n" % (RXN,PROD,value,status1));
 
     f.close();
-
+######################################################################################
+#4.  This function converts a model which fractionally charged metabolites to a classical 
+     #model by setting the pH to default in any particular compartment.
+######################################################################################
 
 def convertToClassicalModel(cobra_model2,comp="*",updateCharges=""):
     if not updateCharges == "":
@@ -544,6 +572,12 @@ def convertToClassicalModel(cobra_model2,comp="*",updateCharges=""):
     uncharged = cobra_model.copy()
     return uncharged
 
+############################################################################################
+#5.    As a result of the above function the model will be in its default state, this function-
+       #helps to update the pH to the compartment. Under different pHs the metabolites will have 
+       #different fractional charge forms that also can be update using this function by uploading 
+       #an excel containing the different fractional charge forms at different pHs.
+############################################################################################
 
 #This function apply the new pH to the compartment
 def convertToFractionalCharges(uncharged,infile="MetaboliteChargedStates.xlsx",compH={"v2":5.5},TransferTag=""):

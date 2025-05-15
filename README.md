@@ -11,7 +11,12 @@ A repository housing scripts that can be used to generate C3, CAM and C4 diel le
 [Case study: studying how daylength affects day-time starch accumulation rate in C3 leaves](https://colab.research.google.com/drive/1F1v2fpFF_15e_zip4YzfziIQkYY58mV6?usp=sharing)
 
 ### Repository contents
-- Functions.py - a file containing all user-defined functions required in the study
+- Functions.py - a file containing all user-defined functions required in the study.The file contains functions used in the study to describe different case uses. Diel leaf model       
+                construction required a function to make the PlantCoreMetabolism model to a day-night C3plant condition. This function can be used in any other leaf metabolic model
+                to make it diel C3. We created another function for creating a diel C4 model, as mentioned in the use cases part of the manuscript. A general function was created to     
+                visualise model results and represented as generateFluxMap. We have updated the pH of the model compartments and included fractionally charged forms of metabolites
+                using two different functions, convertToClassicalModel and convertToFractionalCharges.
+  
 - PlantCoreMetabolism_v2_0_0.xml - The PlantCoreMetabolism version 2.0.0 model in SBML format
 - C3_model.sbml - diel leaf model constrained for C3 photosynthesis
 - C4_model.sbml - diel leaf meodel constrained for C4 photosynthesis

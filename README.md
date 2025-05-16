@@ -25,7 +25,7 @@ A repository housing scripts that can be used to generate C3, CAM and C4 diel le
 - C4_model.sbml - diel leaf meodel constrained for C4 photosynthesis
 ### Applications
 - Studying_how_starch_accumulation_changes_with_daylength_in_C3_leaves.ipynb - an IPython notebook that demonstrates how daylength can be varied in a 2-phase diel leaf model, and how such models can be used to study the effect of daylength on metabolism
-- Photorespiratory_bypass.ipynb - 
+- Photorespiratory bypass_C3.ipynb - 
 ### Data
 - PlantCoreMetabolism2.cys - manually organized Cytoscape network of the core model with styles configured to visualize fluxes from 2-phase diel FBA model
 - Adding_Arabidopsis_gene_associations_to_PlanCoreMetabolism_models.ipynb - an IPython notebook that demonstrates how gene associations can be added to the PlantCoreMetabolism models

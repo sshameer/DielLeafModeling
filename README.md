@@ -17,15 +17,15 @@ A repository housing scripts that can be used to generate C3, CAM and C4 diel le
 - dielC3_script.ipynb - an IPython notebook that uses the C3 sbml file to model C3 metabolism
 - dielCAM_script.ipynb - an IPython notebook that uses the C3 sbml file to model CAM metabolism
 - dielC4_script.ipynb - an IPython notebook that uses the C4 sbml file to model C4 metabolism
-- NocturnalCitrateInC3Leaves.ipynb -
-- Biomass_composition.ipynb -
+- NocturnalCitrateInC3Leaves.ipynb - an IPython notebook that uses the C3 sbml to describe the role of nocturnal citrate and its visualization using fluxmap  
+- Biomass_composition.ipynb - an IPython notebook to explore different biomass compositions in C3 model. 
 ### Models
 - PlantCoreMetabolism_v2_0_0.xml - The PlantCoreMetabolism version 2.0.0 model in SBML format
 - C3_model.sbml - diel leaf model constrained for C3 photosynthesis
 - C4_model.sbml - diel leaf meodel constrained for C4 photosynthesis
 ### Applications
 - Studying_how_starch_accumulation_changes_with_daylength_in_C3_leaves.ipynb - an IPython notebook that demonstrates how daylength can be varied in a 2-phase diel leaf model, and how such models can be used to study the effect of daylength on metabolism
-- Photorespiratory bypass_C3.ipynb - 
+- Photorespiratory bypass_C3.ipynb - an IPython notebook which uses different alternate photorespiratory pathways for analysing the photosynthetic efficiency 
 ### Data
 - PlantCoreMetabolism2.cys - manually organized Cytoscape network of the core model with styles configured to visualize fluxes from 2-phase diel FBA model
 - Adding_Arabidopsis_gene_associations_to_PlanCoreMetabolism_models.ipynb - an IPython notebook that demonstrates how gene associations can be added to the PlantCoreMetabolism models

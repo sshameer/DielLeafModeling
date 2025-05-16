@@ -29,7 +29,7 @@ A repository housing scripts that can be used to generate C3, CAM and C4 diel le
 ### Data
 - PlantCoreMetabolism2.cys - manually organized Cytoscape network of the core model with styles configured to visualize fluxes from 2-phase diel FBA model
 - Adding_Arabidopsis_gene_associations_to_PlanCoreMetabolism_models.ipynb - an IPython notebook that demonstrates how gene associations can be added to the PlantCoreMetabolism models
-- Uniprotkb_AND_model_organism_3702_2025_05_13.tsv - 
+- Uniprotkb_AND_model_organism_3702_2025_05_13.tsv - a tsv file with compiled information of EC numbers and subcellular localizations of genes. 
   
 
 

@@ -5,6 +5,7 @@ A repository housing scripts that can be used to generate C3, CAM and C4 diel le
 [Adding Arabidopsis Gene-Protein-Reaction Associations to the PlantCoreMetabolism model](https://colab.research.google.com/drive/1ziN3L51226-YH9JL-WoOVuerPDr-vasN?usp=sharing)  
 [Generate C3 and C4 model from PlantCoreMetabolism](https://colab.research.google.com/drive/1ZCU4f5AkWnWa7IaWoS0czV7hsgNpbfSr?usp=sharing)  
 [Model C3 leaf metabolism](https://colab.research.google.com/drive/1cWz1xdf4a2G19CyOA2HV03jqyw5MaWR7?usp=drive_link)  
+[Tailoring diel leaf C3 model for any particular plant species](https://colab.research.google.com/drive/1x9n5cJV7wvIc1gdQHRV0iylhtquGDQKa?usp=sharing)  
 [Model CAM leaf metabolism](https://colab.research.google.com/drive/1YLDYLRVifLH0N1vt8qFrL7EgpFInGhwg?usp=sharing)  
 [Model C4 leaf metabolism](https://colab.research.google.com/drive/17ztwZvQ7urK_zM2SZ7pHNRdCxeMfocjv?usp=sharing)  
 [Case study and flux visualization](https://colab.research.google.com/drive/1vXCq1sA72_pQM_V1tugicJUqPi-nGn2j?usp=sharing)  
